@@ -1,0 +1,24 @@
+#pieCanvas{
+    border: 1px black solid;
+    width: 800px;
+    height: 800px;
+    margin: 10px;
+}
+
+#canvDiv{
+    display: flex;
+    justify-content: center;
+}
+
+#buttonDiv{
+    display: flex;
+    justify-content: center;
+}
+
+#aboutDiv{
+    background-color: lightblue;
+    border: 3px solid dodgerblue;
+    padding: 10px;
+    margin: auto;
+    text-align: center; 
+}
