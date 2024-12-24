@@ -43,13 +43,41 @@
             </div>
         </div>
     </nav>
-    <div id="canvDiv">
-        <canvas id="pieCanvas"></canvas>
-        <canvas id="pieCanvas"></canvas>
+
+    <br><br> <!--Spacing lol | maybe add some more information here too about how to use the site idk-->
+
+    <div id="inputOptions" class="container text-center"> <!--inputs go here-->
+
+        <div id="inputLabelRow" class="row justify-content-evenly">
+            <label class="col-3" for="selectFileInput">Select a local csv file</label>
+            <div class = "col-1"></div>
+            <label class="col-3" for="dragDropFileInput">Drag and drop a file here</label>
+        </div>
+
+        <div id="inputInputsRow" class="row justify-content-evenly">
+            <input class="col-3" type="file" id="selectFileInput" accept=".csv"> <!--https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file might be helpful later-->
+
+            <label class = "col-1">OR</label>
+
+            <div class="col-3" id="drop-target"></div> <!--placeholder throwaway stuff-->
+        </div>
+
+        <div id="inputButtonsRow" class="row justify-content">
+            <button class="col-2 offset-5" id="submitFileButton">Submit</button>
+        </div>
+
     </div>
-    <div id="buttonDiv">
-        <button type="submit" id="submitButton" class="btn btn-secondary">Create pie chart</button>
+
+
+    <div id="canvDiv"> <!--Canvas is here-->
+        <canvas id="pieCanvas" ></canvas>
     </div>
+    
+    <div id="canvasOptions"> <!--Other canvas options go here-->
+
+    </div>
+
+
 </body>
 
 </html>
