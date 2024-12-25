@@ -5,3 +5,5 @@ https://github.com/mdn/learning-area
 https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file
 
 https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API
+
+https://medium.com/@ryan_forrester_/read-csv-files-in-javascript-how-to-guide-8d0ac6df082a 
