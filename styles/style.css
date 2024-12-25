@@ -8,6 +8,7 @@
 #canvDiv{
     display: flex;
     justify-content: center;
+    visibility: hidden;
 }
 
 #buttonDiv{
@@ -21,4 +22,22 @@
     padding: 10px;
     margin: auto;
     text-align: center; 
+}
+
+#canvasOptions{
+    visibility: hidden;
+}
+
+#drop-target{
+    border: 3px grey dashed;
+
+}
+
+#inputInputsRow{
+    height: 50px;
+}
+
+label{
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
 }

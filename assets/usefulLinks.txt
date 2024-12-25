@@ -1,0 +1,7 @@
+I'm sure we'll remember to delete this later
+
+https://github.com/mdn/learning-area
+
+https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file
+
+https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API
