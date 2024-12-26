@@ -1,17 +1,29 @@
+let fileHandled = undefined; //its here cause the drop handler is not in .onload. pls just let me live i know it looks stupid ;-; 
+
 window.onload = function () {
     let pieCanvas = document.getElementById('pieCanvas');
     let pCtx = pieCanvas.getContext("2d");
     let canvDiv = document.getElementById('canvDiv');
     let canvasOptions = document.getElementById('canvasOptions');
     let updateBtn = document.getElementById('updateBtn');
+    let submitBtn = document.getElementById("submitFileButton");
+    let fileInput = document.getElementById("selectFileInput")
+
 
     let width = pieCanvas.width;
     let height = pieCanvas.height;
 
-    elem = document.getElementById("submitFileButton");
-    elem.addEventListener("click", () => {
+    submitBtn.addEventListener("click", () => {
         //validation
-        console.log("still works");
+        //console.log(fileHandled, typeof(fileHandled));
+
+        if (fileHandled === undefined) fileHandled = fileInput.files[0] //could switch this to a listener da ma simt taranca srry
+        if (fileHandled){ 
+        let labelsArray = []; 
+        let valuesArray = []; 
+        parseFile(fileHandled, labelsArray, valuesArray); //should have the labels and the sum of all values per column (if its on multiple lines)
+        //console.log(labelsArray);    <- checked, they are working currently
+        //console.log(valuesArray);
 
         //display canvas and all that
         canvDiv.style.visibility = "visible";    //make the canvas visible
@@ -25,11 +37,17 @@ window.onload = function () {
         updateBtn.addEventListener("click", () => {
             updatePieColor(angles[2], "white", 2);
         })
+
+    }
+    else {
+        alert("No selected file!");
+    }
+
+
     })
 
 
     //!!!!!UTILS
-
     function drawPie(argsArray, labelsArray) {              //input: an array of values
         let total = 0;                                      //used to compute the percentages in pie
         let last = 0;                                       //also for percentage
@@ -98,5 +116,75 @@ window.onload = function () {
         var blue = Math.floor(Math.random() * 256);
 
         return "rgb(" + red + "," + green + "," + blue + " )";
+    }
+
+    function parseFile(file, labelsArray, valuesArray){
+        labelsArray=[];
+        valuesArray=[];
+        let sums=[];
+        nrColumns = 0;
+        if (file) {
+            let line;
+            let resultString;
+            let reader = new FileReader();
+            reader.readAsText(file);
+            reader.onload = function(e){
+                resultString = reader.result;
+                resultString = resultString.split("\r\n"); //split it per lines
+
+                line = resultString[0].split(","); //label parsing
+
+                    for (let j =0; j<line.length; j++){
+                        labelsArray[j] = line[j];
+                        nrColumns++;
+                    }
+
+                    sums=new Array(nrColumns).fill(0); //initialize the sums array
+
+                for (let i=1; i<resultString.length; i++){ //values parsing
+                    line = resultString[i].split(","); 
+
+                    for (let j =0; j<line.length; j++){
+                        sums[j] += Number(line[j]);
+                    }
+
+                }
+                valuesArray = sums;
+
+                //console.log(resultString); 
+                //console.log(labelsArray);
+                //console.log(valuesArray);
+            }
+        }
+    }
+
+
+}
+
+
+function dragOverHandler(ev) {
+    console.log('File(s) in drop zone');
+    ev.preventDefault();
+  }
+
+
+function dropHandler(ev) {
+    console.log('File(s) dropped');
+
+    ev.preventDefault();
+
+    if (ev.dataTransfer.items) {
+        if (ev.dataTransfer.items[0].kind === 'file' && (ev.dataTransfer.items[0].getAsFile().type === 'text/csv' || ev.dataTransfer.items[0].getAsFile().name.endsWith('.csv'))){
+            fileHandled = ev.dataTransfer.items[0].getAsFile(); ///here we get the file from the drag and drop API
+        }
+    }
+    removeDragData(ev)
+}
+
+function removeDragData(ev) {
+    //console.log('Removing drag data')
+
+    if (ev.dataTransfer.items) {
+        ev.dataTransfer.items.clear();
     }
 }
