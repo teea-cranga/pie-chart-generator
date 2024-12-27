@@ -9,42 +9,43 @@ window.onload = function () {
     let submitBtn = document.getElementById("submitFileButton");
     let fileInput = document.getElementById("selectFileInput")
 
-
     let width = pieCanvas.width;
     let height = pieCanvas.height;
+    let defaultColors = ["red", "orange", "green", "yellow", "blue", "white", "purple", "cyan", "magenta"];
 
     submitBtn.addEventListener("click", () => {
         //validation
         //console.log(fileHandled, typeof(fileHandled));
 
         if (fileHandled === undefined) fileHandled = fileInput.files[0] //could switch this to a listener da ma simt taranca srry
-        if (fileHandled){ 
-        let labelsArray = []; 
-        let valuesArray = []; 
-        parseFile(fileHandled, labelsArray, valuesArray); //should have the labels and the sum of all values per column (if its on multiple lines)
-        //console.log(labelsArray);    <- checked, they are working currently
-        //console.log(valuesArray);
+        if (fileHandled){  
+        
+        let Arrays = {
+            keys: [],
+            values: [] 
+        };
+
+        parseFile(fileHandled, Arrays); //should have the labels and the sum of all values per column (if its on multiple lines)
+        console.log(Arrays.keys);
+        console.log(Arrays.values);
 
         //display canvas and all that
         canvDiv.style.visibility = "visible";    //make the canvas visible
         canvasOptions.style.visibility = "visible";
-
-        let values = [230, 345, 100, 654];       //test variables
-        let labels = ["label_1", "label_2", "label_3", "label_4"];
-        let angles = drawPie(values, labels);
+        
+       // let angles = drawPie(valuesArray, labelsArray);
 
         // !!!! WIP THIS WILL BE DELETED EVENTUALLY 
         updateBtn.addEventListener("click", () => {
             updatePieColor(angles[2], "white", 2);
-        })
+        });
 
     }
     else {
         alert("No selected file!");
     }
 
-
-    })
+    });
 
 
     //!!!!!UTILS
@@ -65,13 +66,13 @@ window.onload = function () {
             pCtx.fillStyle = generateRandomColor();
             pCtx.beginPath();
 
-            pCtx.moveTo(width / 2 - 150, height / 2);      //move to center
+            pCtx.moveTo(width / 2 - 150, height / 2);       //move to center
             pCtx.arc(width / 2 - 150, height / 2, height / 3, last, last + Math.PI * 2 * (argsArray[i] / total));
 
             angles.push([last, last + Math.PI * 2 * (argsArray[i] / total)]);
             last += Math.PI * 2 * (argsArray[i] / total);   //add the end of the last angle ^ 
             pCtx.lineWidth = 2;
-            pCtx.lineTo(width / 2 - 150, height / 2);      //to make the pie lines
+            pCtx.lineTo(width / 2 - 150, height / 2);       //to make the pie lines
 
             //rectangle with color for label
             pCtx.rect(width / 2 + 170, 30 * i + 10, 20, 20);
@@ -81,7 +82,7 @@ window.onload = function () {
             pCtx.save();                                    //to keep the coordinates as they are above
 
             //for labels
-            pCtx.translate(width / 2 + 150, 30 * (i + 1));    // move the cursor in order for the labels and pie to not overlap
+            pCtx.translate(width / 2 + 150, 30 * (i + 1));  // move the cursor in order for the labels and pie to not overlap
             pCtx.fillStyle = "black"; //for text
             pCtx.font = height / 3 / 10 + "px Arial";
             pCtx.fillText(labelsArray[i] + ': ' + Math.trunc(argsArray[i] / total * 100) + '%', pCtx.measureText(labelsArray[i]).width / 2, 0);
@@ -118,9 +119,11 @@ window.onload = function () {
         return "rgb(" + red + "," + green + "," + blue + " )";
     }
 
-    function parseFile(file, labelsArray, valuesArray){
-        labelsArray=[];
-        valuesArray=[];
+    function parseFile(file, Arrays){
+       
+        let labelsArray = [];
+        let valuesArray = [];
+
         let sums=[];
         nrColumns = 0;
         if (file) {
@@ -151,9 +154,13 @@ window.onload = function () {
                 }
                 valuesArray = sums;
 
-                //console.log(resultString); 
-                //console.log(labelsArray);
-                //console.log(valuesArray);
+                console.log(resultString); 
+                console.log(labelsArray);
+                console.log(valuesArray);
+
+                Arrays.keys = labelsArray;
+                Arrays.values = valuesArray;
+
             }
         }
     }
