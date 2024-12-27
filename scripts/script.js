@@ -13,7 +13,7 @@ window.onload = function () {
     let height = pieCanvas.height;
     let defaultColors = ["red", "orange", "green", "yellow", "blue", "white", "purple", "cyan", "magenta"];
 
-    submitBtn.addEventListener("click", () => {
+    submitBtn.addEventListener("click", async () => {
         //validation
         //console.log(fileHandled, typeof(fileHandled));
 
@@ -25,7 +25,9 @@ window.onload = function () {
             values: [] 
         };
 
-        parseFile(fileHandled, Arrays); //should have the labels and the sum of all values per column (if its on multiple lines)
+        Arrays = await parseFile(fileHandled); //should have the labels and the sum of all values per column (if its on multiple lines)
+
+        console.log("AFTER ASYNC READER FUNCTION")
         console.log(Arrays.keys);
         console.log(Arrays.values);
 
@@ -119,11 +121,13 @@ window.onload = function () {
         return "rgb(" + red + "," + green + "," + blue + " )";
     }
 
-    function parseFile(file, Arrays){
-       
-        let labelsArray = [];
-        let valuesArray = [];
-
+    function readFileAsync(file) { 
+        let Arrays = {
+            keys: [],
+            values: [] 
+        };
+        return new Promise((resolve, reject) => { 
+            
         let sums=[];
         nrColumns = 0;
         if (file) {
@@ -138,7 +142,7 @@ window.onload = function () {
                 line = resultString[0].split(","); //label parsing
 
                     for (let j =0; j<line.length; j++){
-                        labelsArray[j] = line[j];
+                        Arrays.keys[j] = line[j];
                         nrColumns++;
                     }
 
@@ -152,19 +156,36 @@ window.onload = function () {
                     }
 
                 }
-                valuesArray = sums;
+                Arrays.values = sums;
 
-                console.log(resultString); 
-                console.log(labelsArray);
-                console.log(valuesArray);
+                //console.log(resultString); 
+                //console.log(Arrays.keys);
+                //console.log(Arrays.values);
 
-                Arrays.keys = labelsArray;
-                Arrays.values = valuesArray;
+                resolve(Arrays);
 
             }
+            reader.onerror = reject; 
         }
+            
+        }); 
+    } 
+    
+    async function parseFile(file) { 
+        let Arrays = {
+            keys: [],
+            values: [] 
+        };
+        try { 
+            const Arrays = await readFileAsync(file); 
+            console.log("File read successfully:", Arrays); 
+            // Continue execution after onload is done 
+            return Arrays;
+        } 
+        catch (error) { 
+            console.error("Error reading file:", error); 
+        } 
     }
-
 
 }
 
