@@ -5,7 +5,6 @@ window.onload = function () {
     let pCtx = pieCanvas.getContext("2d");
     let canvDiv = document.getElementById('canvDiv');
     let canvasOptions = document.getElementById('canvasOptions');
-    let updateBtn = document.getElementById('updateBtn');
     let submitBtn = document.getElementById("submitFileButton");
     let fileInput = document.getElementById("selectFileInput")
 
@@ -20,11 +19,10 @@ window.onload = function () {
         if (fileHandled === undefined) fileHandled = fileInput.files[0] //could switch this to a listener da ma simt taranca srry
         if (fileHandled) {
 
-        Arrays = await parseFile(fileHandled); //should have the labels and the sum of all values per column (if its on multiple lines)
-
-        console.log("AFTER ASYNC READER FUNCTION")
-        console.log(Arrays.keys);
-        console.log(Arrays.values);
+            let Arrays = {
+                keys: [],
+                values: []
+            };
 
             Arrays = await parseFile(fileHandled); //should have the labels and the sum of all values per column (if its on multiple lines)
 
@@ -45,7 +43,7 @@ window.onload = function () {
 
                 let text = document.createTextNode("Label: " + Arrays.keys[i]);
                 text.classList = 'text';
-                
+
                 let textInput1 = document.createElement('p');
                 textInput1.innerHTML = "Enter new name: "
                 let inputLabel = document.createElement("input");
@@ -54,7 +52,7 @@ window.onload = function () {
                 textInput2.innerHTML = "Enter color: "
                 let inputColor = document.createElement("input");
                 inputColor.style.margin = "3px";
-                
+
                 let divButt = document.createElement('div');
                 divButt.classList = 'row justify-content';
                 let subButton = document.createElement('button');
@@ -154,7 +152,7 @@ window.onload = function () {
 
         return "rgb(" + red + "," + green + "," + blue + " )";
     }
-
+    
     function readFileAsync(file) { 
         let Arrays = {
             keys: [],
@@ -173,30 +171,21 @@ window.onload = function () {
                 resultString = reader.result;
                 resultString = resultString.split("\r\n"); //split it per lines
 
-                    line = resultString[0].split(","); //label parsing
+                line = resultString[0].split(","); //label parsing
 
                     for (let j =0; j<line.length; j++){
                         Arrays.keys[j] = line[j];
                         nrColumns++;
                     }
 
-                    sums = new Array(nrColumns).fill(0); //initialize the sums array
+                    sums=new Array(nrColumns).fill(0); //initialize the sums array
 
-                    for (let i = 1; i < resultString.length; i++) { //values parsing
-                        line = resultString[i].split(",");
+                for (let i=1; i<resultString.length; i++){ //values parsing
+                    line = resultString[i].split(","); 
 
-                        for (let j = 0; j < line.length; j++) {
-                            sums[j] += Number(line[j]);
-                        }
-
+                    for (let j =0; j<line.length; j++){
+                        sums[j] += Number(line[j]);
                     }
-                    Arrays.values = sums;
-
-                    //console.log(resultString); 
-                    //console.log(Arrays.keys);
-                    //console.log(Arrays.values);
-
-                    resolve(Arrays);
 
                 }
                 Arrays.values = sums;
@@ -211,23 +200,23 @@ window.onload = function () {
             reader.onerror = reject; 
         }
             
-        ); 
+        }); 
     } 
-    
-    async function parseFile(file) { 
+
+    async function parseFile(file) {
         let Arrays = {
             keys: [],
-            values: [] 
+            values: []
         };
-        try { 
-            const Arrays = await readFileAsync(file); 
-            console.log("File read successfully:", Arrays); 
+        try {
+            const Arrays = await readFileAsync(file);
+            console.log("File read successfully:", Arrays);
             // Continue execution after onload is done 
             return Arrays;
-        } 
-        catch (error) { 
-            console.error("Error reading file:", error); 
-        } 
+        }
+        catch (error) {
+            console.error("Error reading file:", error);
+        }
     }
 
 }
