@@ -13,37 +13,68 @@ window.onload = function () {
     let height = pieCanvas.height;
     let defaultColors = ["red", "orange", "green", "yellow", "blue", "white", "purple", "cyan", "magenta"];
 
-    submitBtn.addEventListener("click", () => {
+    submitBtn.addEventListener("click", async () => {
         //validation
         //console.log(fileHandled, typeof(fileHandled));
 
         if (fileHandled === undefined) fileHandled = fileInput.files[0] //could switch this to a listener da ma simt taranca srry
-        if (fileHandled){  
-        
-        let Arrays = {
-            keys: [],
-            values: [] 
-        };
+        if (fileHandled) {
 
-        parseFile(fileHandled, Arrays); //should have the labels and the sum of all values per column (if its on multiple lines)
-        console.log(Arrays.keys);
-        console.log(Arrays.values);
+            let Arrays = {
+                keys: [],
+                values: []
+            };
 
-        //display canvas and all that
-        canvDiv.style.visibility = "visible";    //make the canvas visible
-        canvasOptions.style.visibility = "visible";
-        
-       // let angles = drawPie(valuesArray, labelsArray);
+            Arrays = await parseFile(fileHandled); //should have the labels and the sum of all values per column (if its on multiple lines)
 
-        // !!!! WIP THIS WILL BE DELETED EVENTUALLY 
-        updateBtn.addEventListener("click", () => {
-            updatePieColor(angles[2], "white", 2);
-        });
+            console.log("AFTER ASYNC READER FUNCTION")
+            console.log(Arrays.keys);
+            console.log(Arrays.values);
 
-    }
-    else {
-        alert("No selected file!");
-    }
+            //display canvas and all that
+            canvDiv.style.visibility = "visible";    //make the canvas visible
+            canvasOptions.style.visibility = "visible";
+            submitBtn.disabled = true;
+
+            let angles = drawPie(Arrays.values, Arrays.keys);
+
+            for (i = 0; i < Arrays.values.length; i++) {
+                let div = document.createElement("div");
+                div.classList = 'container text-center';
+
+                let text = document.createTextNode("Label: " + Arrays.keys[i]);
+                text.classList = 'text';
+                
+                let textInput1 = document.createElement('p');
+                textInput1.innerHTML = "Enter new name: "
+                let inputLabel = document.createElement("input");
+
+                let textInput2 = document.createElement('p');
+                textInput2.innerHTML = "Enter color: "
+                let inputColor = document.createElement("input");
+                inputColor.style.margin = "3px";
+                
+                let divButt = document.createElement('div');
+                divButt.classList = 'row justify-content';
+                let subButton = document.createElement('button');
+                subButton.classList = "col-2 offset-5";
+                subButton.innerHTML = "Update";
+                divButt.appendChild(subButton);
+
+                div.appendChild(text);
+                div.appendChild(textInput1);
+                div.appendChild(inputLabel);
+                div.appendChild(textInput2);
+                div.appendChild(inputColor);
+                div.appendChild(divButt);
+                canvasOptions.appendChild(div);
+            }
+
+
+        }
+        else {
+            alert("No selected file!");
+        }
 
     });
 
@@ -96,6 +127,10 @@ window.onload = function () {
     //  WIP !!!!
     function updatePieColor(last, newColor, i) {
 
+        if (last.length < i) {
+            alert("error");
+        }
+
         pCtx.beginPath();
         pCtx.fillStyle = newColor;
         pCtx.lineWidth = 2;
@@ -119,52 +154,71 @@ window.onload = function () {
         return "rgb(" + red + "," + green + "," + blue + " )";
     }
 
-    function parseFile(file, Arrays){
-       
-        let labelsArray = [];
-        let valuesArray = [];
+    function readFileAsync(file) {
+        let Arrays = {
+            keys: [],
+            values: []
+        };
+        return new Promise((resolve, reject) => {
 
-        let sums=[];
-        nrColumns = 0;
-        if (file) {
-            let line;
-            let resultString;
-            let reader = new FileReader();
-            reader.readAsText(file);
-            reader.onload = function(e){
-                resultString = reader.result;
-                resultString = resultString.split("\r\n"); //split it per lines
+            let sums = [];
+            nrColumns = 0;
+            if (file) {
+                let line;
+                let resultString;
+                let reader = new FileReader();
+                reader.readAsText(file);
+                reader.onload = function (e) {
+                    resultString = reader.result;
+                    resultString = resultString.split("\r\n"); //split it per lines
 
-                line = resultString[0].split(","); //label parsing
+                    line = resultString[0].split(","); //label parsing
 
-                    for (let j =0; j<line.length; j++){
-                        labelsArray[j] = line[j];
+                    for (let j = 0; j < line.length; j++) {
+                        Arrays.keys[j] = line[j];
                         nrColumns++;
                     }
 
-                    sums=new Array(nrColumns).fill(0); //initialize the sums array
+                    sums = new Array(nrColumns).fill(0); //initialize the sums array
 
-                for (let i=1; i<resultString.length; i++){ //values parsing
-                    line = resultString[i].split(","); 
+                    for (let i = 1; i < resultString.length; i++) { //values parsing
+                        line = resultString[i].split(",");
 
-                    for (let j =0; j<line.length; j++){
-                        sums[j] += Number(line[j]);
+                        for (let j = 0; j < line.length; j++) {
+                            sums[j] += Number(line[j]);
+                        }
+
                     }
+                    Arrays.values = sums;
+
+                    //console.log(resultString); 
+                    //console.log(Arrays.keys);
+                    //console.log(Arrays.values);
+
+                    resolve(Arrays);
 
                 }
-                valuesArray = sums;
-
-                console.log(resultString); 
-                console.log(labelsArray);
-                console.log(valuesArray);
-
-                Arrays.keys = labelsArray;
-                Arrays.values = valuesArray;
-
+                reader.onerror = reject;
             }
-        }
+
+        });
     }
 
+    async function parseFile(file) {
+        let Arrays = {
+            keys: [],
+            values: []
+        };
+        try {
+            const Arrays = await readFileAsync(file);
+            console.log("File read successfully:", Arrays);
+            // Continue execution after onload is done 
+            return Arrays;
+        }
+        catch (error) {
+            console.error("Error reading file:", error);
+        }
+    }
 
 }
 
@@ -172,7 +226,7 @@ window.onload = function () {
 function dragOverHandler(ev) {
     console.log('File(s) in drop zone');
     ev.preventDefault();
-  }
+}
 
 
 function dropHandler(ev) {
@@ -181,7 +235,7 @@ function dropHandler(ev) {
     ev.preventDefault();
 
     if (ev.dataTransfer.items) {
-        if (ev.dataTransfer.items[0].kind === 'file' && (ev.dataTransfer.items[0].getAsFile().type === 'text/csv' || ev.dataTransfer.items[0].getAsFile().name.endsWith('.csv'))){
+        if (ev.dataTransfer.items[0].kind === 'file' && (ev.dataTransfer.items[0].getAsFile().type === 'text/csv' || ev.dataTransfer.items[0].getAsFile().name.endsWith('.csv'))) {
             fileHandled = ev.dataTransfer.items[0].getAsFile(); ///here we get the file from the drag and drop API
         }
     }
