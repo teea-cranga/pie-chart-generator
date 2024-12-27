@@ -20,10 +20,11 @@ window.onload = function () {
         if (fileHandled === undefined) fileHandled = fileInput.files[0] //could switch this to a listener da ma simt taranca srry
         if (fileHandled) {
 
-            let Arrays = {
-                keys: [],
-                values: []
-            };
+        Arrays = await parseFile(fileHandled); //should have the labels and the sum of all values per column (if its on multiple lines)
+
+        console.log("AFTER ASYNC READER FUNCTION")
+        console.log(Arrays.keys);
+        console.log(Arrays.values);
 
             Arrays = await parseFile(fileHandled); //should have the labels and the sum of all values per column (if its on multiple lines)
 
@@ -154,27 +155,27 @@ window.onload = function () {
         return "rgb(" + red + "," + green + "," + blue + " )";
     }
 
-    function readFileAsync(file) {
+    function readFileAsync(file) { 
         let Arrays = {
             keys: [],
-            values: []
+            values: [] 
         };
-        return new Promise((resolve, reject) => {
-
-            let sums = [];
-            nrColumns = 0;
-            if (file) {
-                let line;
-                let resultString;
-                let reader = new FileReader();
-                reader.readAsText(file);
-                reader.onload = function (e) {
-                    resultString = reader.result;
-                    resultString = resultString.split("\r\n"); //split it per lines
+        return new Promise((resolve, reject) => { 
+            
+        let sums=[];
+        nrColumns = 0;
+        if (file) {
+            let line;
+            let resultString;
+            let reader = new FileReader();
+            reader.readAsText(file);
+            reader.onload = function(e){
+                resultString = reader.result;
+                resultString = resultString.split("\r\n"); //split it per lines
 
                     line = resultString[0].split(","); //label parsing
 
-                    for (let j = 0; j < line.length; j++) {
+                    for (let j =0; j<line.length; j++){
                         Arrays.keys[j] = line[j];
                         nrColumns++;
                     }
@@ -198,26 +199,35 @@ window.onload = function () {
                     resolve(Arrays);
 
                 }
-                reader.onerror = reject;
+                Arrays.values = sums;
+
+                //console.log(resultString); 
+                //console.log(Arrays.keys);
+                //console.log(Arrays.values);
+
+                resolve(Arrays);
+
             }
-
-        });
-    }
-
-    async function parseFile(file) {
+            reader.onerror = reject; 
+        }
+            
+        ); 
+    } 
+    
+    async function parseFile(file) { 
         let Arrays = {
             keys: [],
-            values: []
+            values: [] 
         };
-        try {
-            const Arrays = await readFileAsync(file);
-            console.log("File read successfully:", Arrays);
+        try { 
+            const Arrays = await readFileAsync(file); 
+            console.log("File read successfully:", Arrays); 
             // Continue execution after onload is done 
             return Arrays;
-        }
-        catch (error) {
-            console.error("Error reading file:", error);
-        }
+        } 
+        catch (error) { 
+            console.error("Error reading file:", error); 
+        } 
     }
 
 }
