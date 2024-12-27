@@ -59,15 +59,53 @@
 
             <label class = "col-1">OR</label>
 
-            <div class="col-3" id="drop-target" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);"></div> 
+            <div class="col-3" id="drop-target" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+                <div id = dropFeedback>File Received</div> 
+            </div> 
+        </div>
+        <br><br>
+
+        <div id="inputCustomizables" class="container text-center">
+            <fieldset>
+                <legend> We should aggregate by: </legend>
+                <input type="radio" id="aggregateRow" name="aggregate" value="Row">
+                <label for="aggregateRow">Row</label><br>
+                <input type="radio" id="aggregateColumn" name="aggregate" value="Column" checked="true" >
+                <label for="aggregateColumn">Column</label><br>
+            </fieldset>
+    
+            <fieldset>
+                <legend> The data has labeled: </legend>
+                <div>
+                    <input type="checkbox" name="dataLabelsRows" id="chkDataLabelRows" />
+                    <label for="dataLabelsRows">Rows</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="dataLabelsColumns" id="chkDataLabelColumns" checked="true"/>
+                    <label for="dataLabelsColumns">Columns</label>
+                </div>
+            </fieldset>
+    
+            <fieldset>
+                <legend> There is a sum for ___ of the data. </legend>
+                <div>
+                    <input type="checkbox" name="sumDataRows" id="sumDataRows" />
+                    <label for="sumDataRows" title="the last column is a sum column">every row</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="sumDataColumns" id="sumDataColumns" />
+                    <label for="sumDataColumns" title="the last row is a sum row">every column</label>
+                </div>
+            </fieldset>
+        </form>        
         </div>
 
-        <div id="inputButtonsRow" class="row justify-content">
-            <button class="col-2 offset-5" id="submitFileButton">Submit</button>
+        <div id="inputButtonsRow" class="row justify-content-evenly">
+            <button class="col-3" id="submitFileButton">Submit</button>
+            <button class="col-3" id="clearFileButton">Clear file</button>
         </div>
 
     </div>
-
 
     <div id="canvDiv"> <!--Canvas is here-->
         <canvas id="pieCanvas" width = "900" height = "800" ></canvas>  <!--TIL: If I don't specify the height and width of the canvas, the drawing will be blurry >:( -->

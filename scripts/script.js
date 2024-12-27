@@ -1,6 +1,15 @@
 let fileHandled = undefined; //its here cause the drop handler is not in .onload. pls just let me live i know it looks stupid ;-; 
 
 window.onload = function () {
+    //#region Form Flags
+    let aggregateRow = document.getElementById("aggregateRow");
+    let aggregateColumn = document.getElementById("aggregateColumn");
+    let chkDataLabelRows = document.getElementById("chkDataLabelRows");
+    let chkDataLabelColumns = document.getElementById("chkDataLabelColumns");
+    let sumDataRows = document.getElementById("sumDataRows");
+    let sumDataColumns = document.getElementById("sumDataColumns");
+    //#endregion
+
     let pieCanvas = document.getElementById('pieCanvas');
     let pCtx = pieCanvas.getContext("2d");
     let canvDiv = document.getElementById('canvDiv');
@@ -12,73 +21,115 @@ window.onload = function () {
     let height = pieCanvas.height;
     let defaultColors = ["red", "orange", "green", "yellow", "blue", "white", "purple", "cyan", "magenta"];
 
-    submitBtn.addEventListener("click", async () => {
-        //validation
-        //console.log(fileHandled, typeof(fileHandled));
+    document.getElementById("clearFileButton").addEventListener("click", ()=>{ //clear file button implementation
+        fileHandled = undefined;
+        document.getElementById("dropFeedback").style.visibility='hidden';
+        document.getElementById("inputCustomizables").style.display="none";
+        fileInput.value = '';
 
-        if (fileHandled === undefined) fileHandled = fileInput.files[0] //could switch this to a listener da ma simt taranca srry
-        if (fileHandled) {
+    })
 
-            let Arrays = {
-                keys: [],
-                values: []
-            };
-
-            Arrays = await parseFile(fileHandled); //should have the labels and the sum of all values per column (if its on multiple lines)
-
-            console.log("AFTER ASYNC READER FUNCTION")
-            console.log(Arrays.keys);
-            console.log(Arrays.values);
-
-            //display canvas and all that
-            canvDiv.style.visibility = "visible";    //make the canvas visible
-            canvasOptions.style.visibility = "visible";
-            submitBtn.disabled = true;
-
-            let angles = drawPie(Arrays.values, Arrays.keys);
-
-            for (i = 0; i < Arrays.values.length; i++) {
-                let div = document.createElement("div");
-                div.classList = 'container text-center';
-
-                let text = document.createTextNode("Label: " + Arrays.keys[i]);
-                text.classList = 'text';
-
-                let textInput1 = document.createElement('p');
-                textInput1.innerHTML = "Enter new name: "
-                let inputLabel = document.createElement("input");
-
-                let textInput2 = document.createElement('p');
-                textInput2.innerHTML = "Enter color: "
-                let inputColor = document.createElement("input");
-                inputColor.style.margin = "3px";
-
-                let divButt = document.createElement('div');
-                divButt.classList = 'row justify-content';
-                let subButton = document.createElement('button');
-                subButton.classList = "col-2 offset-5";
-                subButton.innerHTML = "Update";
-                divButt.appendChild(subButton);
-
-                div.appendChild(text);
-                div.appendChild(textInput1);
-                div.appendChild(inputLabel);
-                div.appendChild(textInput2);
-                div.appendChild(inputColor);
-                div.appendChild(divButt);
-                canvasOptions.appendChild(div);
-            }
-
-
+    //#region  Flag validation
+    chkDataLabelRows.addEventListener("change", ()=>{ //prevent unchecking labeled rows if we're aggregating by rows
+        if (!chkDataLabelRows.checked && aggregateRow.checked == true) {
+            chkDataLabelRows.checked = true;
         }
+    })
+
+    chkDataLabelColumns.addEventListener("change", ()=>{ //same, with the column aggregate case
+        if (!chkDataLabelColumns.checked && aggregateColumn.checked == true) {
+            chkDataLabelColumns.checked = true;
+        }
+    })
+
+    aggregateRow.onclick = function(){
+        chkDataLabelRows.checked = true;
+        chkDataLabelColumns.checked = false;
+
+    }
+
+    aggregateColumn.onclick = function(){
+        chkDataLabelRows.checked = false;
+        chkDataLabelColumns.checked = true;
+        console.log("skjdhgfkjasdhgklasj");
+    }
+
+    //#endregion
+
+    submitBtn.addEventListener("click", async () => {
+        document.getElementById("dropFeedback").style.visibility='hidden';
+        document.getElementById("inputCustomizables").style.display="none";
+
+        //flags again
+        if (aggregateRow.checked == false && aggregateColumn.checked==false){
+            alert("We must aggregate by something, you know"); //should never get here
+        }   
         else {
-            alert("No selected file!");
+            if (fileHandled) {
+
+    
+    
+                let Arrays = {
+                    keys: [],
+                    values: []
+                };
+    
+                Arrays = await parseFile(fileHandled); //should have the labels and the sum of all values per column (if its on multiple lines)
+    
+                console.log("AFTER ASYNC READER FUNCTION")
+                console.log(Arrays.keys);
+                console.log(Arrays.values);
+    
+                //#region Canvas stuff
+                canvDiv.style.visibility = "visible";    //make the canvas visible
+                canvasOptions.style.visibility = "visible";
+                submitBtn.disabled = true;
+    
+                let angles = drawPie(Arrays.values, Arrays.keys);
+    
+                for (i = 0; i < Arrays.values.length; i++) {
+                    let div = document.createElement("div");
+                    div.classList = 'container text-center';
+    
+                    let text = document.createTextNode("Label: " + Arrays.keys[i]);
+                    text.classList = 'text';
+    
+                    let textInput1 = document.createElement('p');
+                    textInput1.innerHTML = "Enter new name: "
+                    let inputLabel = document.createElement("input");
+    
+                    let textInput2 = document.createElement('p');
+                    textInput2.innerHTML = "Enter color: "
+                    let inputColor = document.createElement("input");
+                    inputColor.style.margin = "3px";
+    
+                    let divButt = document.createElement('div');
+                    divButt.classList = 'row justify-content';
+                    let subButton = document.createElement('button');
+                    subButton.classList = "col-2 offset-5";
+                    subButton.innerHTML = "Update";
+                    divButt.appendChild(subButton);
+    
+                    div.appendChild(text);
+                    div.appendChild(textInput1);
+                    div.appendChild(inputLabel);
+                    div.appendChild(textInput2);
+                    div.appendChild(inputColor);
+                    div.appendChild(divButt);
+                    canvasOptions.appendChild(div);
+                }
+    
+                //#endregion
+            }
+            else {
+                alert("No selected file!");
+            }
         }
 
     });
 
 
-    //!!!!!UTILS
+    //#region Utils
     function drawPie(argsArray, labelsArray) {              //input: an array of values
         let total = 0;                                      //used to compute the percentages in pie
         let last = 0;                                       //also for percentage
@@ -153,6 +204,9 @@ window.onload = function () {
         return "rgb(" + red + "," + green + "," + blue + " )";
     }
     
+    //#endregion
+
+    //#region Zona Cursed
     function readFileAsync(file) { 
         let Arrays = {
             keys: [],
@@ -219,6 +273,14 @@ window.onload = function () {
         }
     }
 
+    //#endregion
+
+    fileInput.addEventListener("change", ()=>{
+        fileHandled = fileInput.files[0];
+        document.getElementById("inputCustomizables").style.display="block"
+    })
+
+
 }
 
 
@@ -230,7 +292,8 @@ function dragOverHandler(ev) {
 
 function dropHandler(ev) {
     console.log('File(s) dropped');
-
+    document.getElementById("dropFeedback").style.visibility='visible';
+    
     ev.preventDefault();
 
     if (ev.dataTransfer.items) {
@@ -239,6 +302,7 @@ function dropHandler(ev) {
         }
     }
     removeDragData(ev)
+    document.getElementById("inputCustomizables").style.display="block"
 }
 
 function removeDragData(ev) {
