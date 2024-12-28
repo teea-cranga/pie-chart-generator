@@ -76,9 +76,9 @@ window.onload = function () {
     
                 Arrays = await parseFile(fileHandled); //should have the labels and the sum of all values per column (if its on multiple lines)
     
-                console.log("AFTER ASYNC READER FUNCTION")
-                console.log(Arrays.keys);
-                console.log(Arrays.values);
+                //console.log("AFTER ASYNC READER FUNCTION")
+                //console.log(Arrays.keys);
+                //console.log(Arrays.values);
     
                 //#region Canvas stuff
                 canvDiv.style.visibility = "visible";    //make the canvas visible
@@ -207,6 +207,7 @@ window.onload = function () {
     //#endregion
 
     //#region Zona Cursed
+    //I am so so sorry for this function
     function readFileAsync(file) { 
         let Arrays = {
             keys: [],
@@ -214,9 +215,10 @@ window.onload = function () {
         };
         return new Promise((resolve, reject) => { 
             
-        let sums=[];
-        nrColumns = 0;
         if (file) {
+            let sums=[];
+            nrColumns = 0;
+            nrRows = 0;
             let line;
             let resultString;
             let reader = new FileReader();
@@ -225,28 +227,47 @@ window.onload = function () {
                 resultString = reader.result;
                 resultString = resultString.split("\r\n"); //split it per lines
 
-                line = resultString[0].split(","); //label parsing
-
-                    for (let j =0; j<line.length; j++){
-                        Arrays.keys[j] = line[j];
+                let holder = resultString[0];
+                holder = holder.split(",");
+                for (let x =0; x<holder.length; x++){
+                    if (holder[x] != '') //in case of empty columns
                         nrColumns++;
-                    }
+                }
 
-                    sums=new Array(nrColumns).fill(0); //initialize the sums array
+                let holderRows = resultString;
+                for (let y =0; y<holderRows.length; y++){
+                    if (holderRows[y] != '') //in case of empty rows
+                        nrRows++;
+                }
 
-                for (let i=1; i<resultString.length; i++){ //values parsing
+                console.log(`Rows: ${nrRows}, Columns: ${nrColumns}`);
+
+                //#region Default: Agg=col Lab=Col Sum=none
+                sums=new Array(nrColumns).fill(0); //initialize the sums array
+
+                for (let i=0; i<resultString.length; i++){ //values parsing
                     line = resultString[i].split(","); 
 
-                    for (let j =0; j<line.length; j++){
-                        sums[j] += Number(line[j]);
+                    if (i==0){
+                        for (let j =0; j<line.length; j++){
+                            Arrays.keys[j] = line[j];
+                            nrColumns++;
+                        }
                     }
-
+                    else {
+                        for (let j =0; j<line.length; j++){
+                            sums[j] += Number(line[j]);
+                        }
+                    }
                 }
+
+                //#endregion
+
+
                 Arrays.values = sums;
 
-                //console.log(resultString); 
-                //console.log(Arrays.keys);
-                //console.log(Arrays.values);
+                console.log(Arrays.keys);
+                console.log(Arrays.values);
 
                 resolve(Arrays);
 
@@ -264,7 +285,7 @@ window.onload = function () {
         };
         try {
             const Arrays = await readFileAsync(file);
-            console.log("File read successfully:", Arrays);
+            //console.log("File read successfully:", Arrays);
             // Continue execution after onload is done 
             return Arrays;
         }
