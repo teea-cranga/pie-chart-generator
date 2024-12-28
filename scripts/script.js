@@ -47,6 +47,7 @@ window.onload = function () {
     }
 
     aggregateColumn.onclick = function () {
+        chkDataLabelRows.checked = false;
         chkDataLabelColumns.checked = true;
         console.log("skjdhgfkjasdhgklasj");
     }
