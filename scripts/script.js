@@ -21,34 +21,34 @@ window.onload = function () {
     let height = pieCanvas.height;
     let defaultColors = ["red", "orange", "green", "yellow", "blue", "white", "purple", "cyan", "magenta"];
 
-    document.getElementById("clearFileButton").addEventListener("click", ()=>{ //clear file button implementation
+    document.getElementById("clearFileButton").addEventListener("click", () => { //clear file button implementation
         fileHandled = undefined;
-        document.getElementById("dropFeedback").style.visibility='hidden';
-        document.getElementById("inputCustomizables").style.display="none";
+        document.getElementById("dropFeedback").style.visibility = 'hidden';
+        document.getElementById("inputCustomizables").style.display = "none";
         fileInput.value = '';
 
     })
 
     //#region  Flag validation
-    chkDataLabelRows.addEventListener("change", ()=>{ //prevent unchecking labeled rows if we're aggregating by rows
+    chkDataLabelRows.addEventListener("change", () => { //prevent unchecking labeled rows if we're aggregating by rows
         if (!chkDataLabelRows.checked && aggregateRow.checked == true) {
             chkDataLabelRows.checked = true;
         }
     })
 
-    chkDataLabelColumns.addEventListener("change", ()=>{ //same, with the column aggregate case
+    chkDataLabelColumns.addEventListener("change", () => { //same, with the column aggregate case
         if (!chkDataLabelColumns.checked && aggregateColumn.checked == true) {
             chkDataLabelColumns.checked = true;
         }
     })
 
-    aggregateRow.onclick = function(){
+    aggregateRow.onclick = function () {
         chkDataLabelRows.checked = true;
         chkDataLabelColumns.checked = false;
 
     }
 
-    aggregateColumn.onclick = function(){
+    aggregateColumn.onclick = function () {
         chkDataLabelRows.checked = false;
         chkDataLabelColumns.checked = true;
         console.log("skjdhgfkjasdhgklasj");
@@ -57,59 +57,59 @@ window.onload = function () {
     //#endregion
 
     submitBtn.addEventListener("click", async () => {
-        document.getElementById("dropFeedback").style.visibility='hidden';
-        document.getElementById("inputCustomizables").style.display="none";
+        document.getElementById("dropFeedback").style.visibility = 'hidden';
+        document.getElementById("inputCustomizables").style.display = "none";
 
         //flags again
-        if (aggregateRow.checked == false && aggregateColumn.checked==false){
+        if (aggregateRow.checked == false && aggregateColumn.checked == false) {
             alert("We must aggregate by something, you know"); //should never get here
-        }   
+        }
         else {
             if (fileHandled) {
 
-    
-    
+
+
                 let Arrays = {
                     keys: [],
                     values: []
                 };
-    
+
                 Arrays = await parseFile(fileHandled); //should have the labels and the sum of all values per column (if its on multiple lines)
-    
+
                 //console.log("AFTER ASYNC READER FUNCTION")
                 //console.log(Arrays.keys);
                 //console.log(Arrays.values);
-    
+
                 //#region Canvas stuff
                 canvDiv.style.visibility = "visible";    //make the canvas visible
                 canvasOptions.style.visibility = "visible";
                 submitBtn.disabled = true;
-    
+
                 let angles = drawPie(Arrays.values, Arrays.keys);
-    
+
                 for (i = 0; i < Arrays.values.length; i++) {
                     let div = document.createElement("div");
                     div.classList = 'container text-center';
-    
+
                     let text = document.createTextNode("Label: " + Arrays.keys[i]);
                     text.classList = 'text';
-    
+
                     let textInput1 = document.createElement('p');
                     textInput1.innerHTML = "Enter new name: "
                     let inputLabel = document.createElement("input");
-    
+
                     let textInput2 = document.createElement('p');
                     textInput2.innerHTML = "Enter color: "
                     let inputColor = document.createElement("input");
                     inputColor.style.margin = "3px";
-    
+
                     let divButt = document.createElement('div');
                     divButt.classList = 'row justify-content';
                     let subButton = document.createElement('button');
                     subButton.classList = "col-2 offset-5";
                     subButton.innerHTML = "Update";
                     divButt.appendChild(subButton);
-    
+
                     div.appendChild(text);
                     div.appendChild(textInput1);
                     div.appendChild(inputLabel);
@@ -118,7 +118,7 @@ window.onload = function () {
                     div.appendChild(divButt);
                     canvasOptions.appendChild(div);
                 }
-    
+
                 //#endregion
             }
             else {
@@ -203,80 +203,161 @@ window.onload = function () {
 
         return "rgb(" + red + "," + green + "," + blue + " )";
     }
-    
+
     //#endregion
 
     //#region Zona Cursed
     //I am so so sorry for this function
-    function readFileAsync(file) { 
+    function readFileAsync(file) {
         let Arrays = {
             keys: [],
-            values: [] 
+            values: []
         };
-        return new Promise((resolve, reject) => { 
-            
-        if (file) {
-            let sums=[];
-            nrColumns = 0;
-            nrRows = 0;
-            let line;
-            let resultString;
-            let reader = new FileReader();
-            reader.readAsText(file);
-            reader.onload = function(e){
-                resultString = reader.result;
-                resultString = resultString.split("\r\n"); //split it per lines
+        return new Promise((resolve, reject) => {
 
-                let holder = resultString[0];
-                holder = holder.split(",");
-                for (let x =0; x<holder.length; x++){
-                    if (holder[x] != '') //in case of empty columns
-                        nrColumns++;
-                }
+            if (file) {
+                let sums = [];
+                nrColumns = 0;
+                nrRows = 0;
+                let lines = [];
+                let resultString;
+                let reader = new FileReader();
+                reader.readAsText(file);
+                reader.onload = function (e) {
+                    resultString = reader.result;
+                    resultString = resultString.split("\r\n"); //split it per lines
 
-                let holderRows = resultString;
-                for (let y =0; y<holderRows.length; y++){
-                    if (holderRows[y] != '') //in case of empty rows
-                        nrRows++;
-                }
+                    //#region NrRows,NrCols 
 
-                console.log(`Rows: ${nrRows}, Columns: ${nrColumns}`);
-
-                //#region Default: Agg=col Lab=Col Sum=none
-                sums=new Array(nrColumns).fill(0); //initialize the sums array
-
-                for (let i=0; i<resultString.length; i++){ //values parsing
-                    line = resultString[i].split(","); 
-
-                    if (i==0){
-                        for (let j =0; j<line.length; j++){
-                            Arrays.keys[j] = line[j];
+                    //(updated in sums init based on flags)
+                    let holder = resultString[0];
+                    holder = holder.split(",");
+                    for (let x = 0; x < holder.length; x++) {
+                        if (holder[x] != '') //in case of empty columns
                             nrColumns++;
-                        }
                     }
+
+                    let holderRows = resultString;
+                    for (let y = 0; y < holderRows.length; y++) {
+                        if (holderRows[y] != '') //in case of empty rows
+                            nrRows++;
+                    }
+                    console.log(`Rows and cols before flags: ${nrRows}, ${nrColumns}`);
+                    //#endregion
+
+                    //#region Sums initialization
+                    if (aggregateColumn.checked == true) {
+                        if (chkDataLabelRows.checked == true){ //if i want to aggregate by columns and there are labels at the start of every row, i ignore the first column
+                            nrColumns-=1;
+                        }
+                        if (sumDataRows.checked == true){ //if i want to aggregate by columns and the last column is a sum column, i ignore that last column
+                            nrColumns-=1;
+                        } 
+                        sums = new Array(nrColumns).fill(0); 
+                    } 
+
                     else {
-                        for (let j =0; j<line.length; j++){
-                            sums[j] += Number(line[j]);
+                        if (chkDataLabelColumns.checked == true){ //if i want to aggregate by rows and there are labels at the start of every column, i ignore the first row
+                            nrRows-=1;
+                        }
+                        if (sumDataColumns.checked == true){ //if i want to aggregate by rows and the last row is a sum row, i ignore that last row
+                            nrRows-=1;
+                        } 
+                        sums = new Array(nrRows).fill(0); 
+                    }
+
+                    console.log(`Rows: ${nrRows}, Columns: ${nrColumns}`);
+                    console.log(sums);
+
+                    //#endregion
+
+                    //#region Matrix building
+                    for (let i = 0; i < resultString.length; i++) { //values parsing
+                        lines[i] = resultString[i].split(",");
+                    }
+
+                    console.log(lines)
+                    //#endregion
+                    
+                    //#region Aggregate by rows case
+                    if (aggregateRow.checked == true){
+                        let labelsFlag = Number(chkDataLabelColumns.checked == true); //first row has labels for the columns
+                        let sumBadFlag = Number(sumDataColumns.checked == true); //last row is a sum row for the columns
+                        let sumGoodFlag = Number(sumDataRows.checked == true); //last column is a sum column for the rows
+
+                        console.log(`labelsFlag: ${labelsFlag}, sumBadFlag: ${sumBadFlag}, sumGoodFlag: ${sumGoodFlag}`);
+                        //console.log(lines[0]);
+
+                        for (let i =0; i< (nrRows + labelsFlag); i++){
+                            Arrays.keys[i] = lines[i][0];
+                        }
+                        if (labelsFlag) Arrays.keys.shift();
+                        // ^ Arrays.keys solved
+
+                        if (sumGoodFlag){
+                            for (let i =0; i< (nrRows+labelsFlag); i++){
+                                Arrays.values[i] = Number(lines[i][nrColumns-1]); //-1 because we start indexes from 0 everywhere
+                            }
+                            if (labelsFlag) Arrays.values.shift();
+                        }
+
+                        else{
+                            for (let i =0+labelsFlag; i< (nrRows+labelsFlag); i++){
+                                for (let j =1; j< nrColumns; j++){
+                                    sums[i-labelsFlag] += Number(lines[i][j]);
+                                }
+                            }
+                            Arrays.values = sums;
                         }
                     }
+                    //#endregion
+
+                    //#region Aggregate by columns case
+                    else{
+                        let labelsFlag = Number(chkDataLabelRows.checked == true); //first column has labels for the rows
+                        let sumBadFlag = Number(sumDataRows.checked == true); //last column is a sum column for the rows
+                        let sumGoodFlag = Number(sumDataColumns.checked == true); //last row is a sum row for the columns
+
+                        console.log(`labelsFlag: ${labelsFlag}, sumBadFlag: ${sumBadFlag}, sumGoodFlag: ${sumGoodFlag}`);
+
+                        for (let i =0; i< (nrColumns + labelsFlag); i++){
+                            Arrays.keys[i] = lines[0][i];
+                        }
+                        if (labelsFlag) Arrays.keys.shift();
+                        // ^ Arrays.keys solved
+
+                        if (sumGoodFlag){
+                            for (let i =0; i< (nrColumns+labelsFlag); i++){
+                                Arrays.values[i] = Number(lines[nrRows-1][i]); //-1 because we start indexes from 0 everywhere
+                            }
+                            if (labelsFlag) Arrays.values.shift();
+                        }
+
+                        else{
+                            for (let i =1; i< (nrRows); i++){
+                                    for (let j =0 + labelsFlag; j< (nrColumns+labelsFlag); j++){
+                                        sums[j - labelsFlag] += Number(lines[i][j]);
+                                        //console.log(j, lines[i][j], sums[j]);
+                                    }                                
+                            }
+                            Arrays.values = sums;
+
+                        }
+
+                    }
+                    //#endregion
+                    
+                    console.log(Arrays.keys);
+                    console.log(Arrays.values);
+
+                    resolve(Arrays);
+
                 }
-
-                //#endregion
-
-
-                Arrays.values = sums;
-
-                console.log(Arrays.keys);
-                console.log(Arrays.values);
-
-                resolve(Arrays);
-
+                reader.onerror = reject;
             }
-            reader.onerror = reject; 
-        }
-            
-        }); 
-    } 
+
+        });
+    }
 
     async function parseFile(file) {
         let Arrays = {
@@ -296,9 +377,9 @@ window.onload = function () {
 
     //#endregion
 
-    fileInput.addEventListener("change", ()=>{
+    fileInput.addEventListener("change", () => {
         fileHandled = fileInput.files[0];
-        document.getElementById("inputCustomizables").style.display="block"
+        document.getElementById("inputCustomizables").style.display = "block"
     })
 
 
@@ -313,8 +394,8 @@ function dragOverHandler(ev) {
 
 function dropHandler(ev) {
     console.log('File(s) dropped');
-    document.getElementById("dropFeedback").style.visibility='visible';
-    
+    document.getElementById("dropFeedback").style.visibility = 'visible';
+
     ev.preventDefault();
 
     if (ev.dataTransfer.items) {
@@ -323,7 +404,7 @@ function dropHandler(ev) {
         }
     }
     removeDragData(ev)
-    document.getElementById("inputCustomizables").style.display="block"
+    document.getElementById("inputCustomizables").style.display = "block"
 }
 
 function removeDragData(ev) {
