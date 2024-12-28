@@ -1,21 +1,4 @@
-#pieCanvas{
-    border: 1px black solid;
-    width: 900px;
-    height: 800px;
-    margin: 10px;
-}
-
-#canvDiv{
-    display: flex;
-    justify-content: center;
-    visibility: hidden;
-}
-
-#buttonDiv{
-    display: flex;
-    justify-content: center;
-}
-
+/*#region About Page*/
 #aboutDiv{
     background-color: lightblue;
     border: 3px solid dodgerblue;
@@ -23,21 +6,72 @@
     margin: auto;
     text-align: center; 
 }
+/*#endregion*/
 
-#canvasOptions{
-    visibility: hidden;
+
+/*#region Index Global*/
+label{
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
 }
+/*#endregion*/
 
+
+/*#region Inputs*/
 #drop-target{
     border: 3px grey dashed;
 
 }
 
+#dropFeedback{
+    visibility: hidden;
+}
+
 #inputInputsRow{
     height: 50px;
 }
+/*#endregion*/
 
-label{
-    text-align: center;
-    font-family: 'Courier New', Courier, monospace;
+/*#region Input Customization*/
+
+#inputCustomizables{
+    /*visibility: hidden;*/
+    display:none; /*using this so it can push everything back when its visible*/
 }
+
+
+/*#endregion
+
+
+/*#region Canvas*/
+#canvDiv{
+    display: flex;
+    justify-content: center;
+    visibility: hidden;
+}
+
+#pieCanvas{
+    border: 1px black solid;
+    width: 900px;
+    height: 800px;
+    margin: 10px;
+}
+/*#endregion*/
+
+
+/*#region Other Canvas options*/
+#canvasOptions{
+    visibility: hidden;
+}
+/*#endregion*/
+
+
+/*????*/
+#buttonDiv{
+    display: flex;
+    justify-content: center;
+}
+
+
+
+
