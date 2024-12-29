@@ -46,7 +46,24 @@
         </div>
     </nav>
 
-    <br><br> <!--Spacing lol | maybe add some more information here too about how to use the site idk-->
+    <!--Spacing lol | maybe add some more information here too about how to use the site idk-->
+    <div class = "container my-5 p-5 text-center bg-body-tertiary rounded-3 border border-secondary" style="flex-direction: column; display: flex; align-items: center;">
+        <h1 class="text-body-emphasis">How to use the site?</h1>
+        <p><b>Step 1:</b> Drag and Drop/Select from your computer what file you want to use to generate a pie chart with (It MUST be a .csv file).</p>
+        <p><b>Step 2:</b> Choose which of the options are suitable for your file:</p>
+        <ul>
+            <li>whether the app should aggregate by rows or columns</li>
+            <li>where the labels are situated (first row or first column)</li>
+            <li>whether the file has sums at the end of rows/columns</li>
+        </ul>
+        <p><b>Step 3:</b> When you think the options are checked correctly, click "Submit". The app will show an error if something went wrong on Step 2.</p>
+        <p><b>Step 4:</b> If you want to change how the pie looks like, 
+            on the right side of the canvas you can select any label and change its color and text.</p>
+        <p><b>TIP:</b>  If you want a faster way to change all the colors, click "Submit" again, because the pie generates other random colors.</p>
+        <p><b>NOTE:</b> If you want to save the picture, right click on it, and select <i>Save image as...</i></p>
+        <br>
+    </div>
+    <br><br>
 
     <div id="inputOptions" class="container text-center"> <!--inputs go here-->
 
@@ -71,21 +88,21 @@
         <div id="inputCustomizables" class="container text-center">
             <fieldset>
                 <legend> We should aggregate by: </legend>
-                <input type="radio" id="aggregateRow" name="aggregate" value="Row">
-                <label for="aggregateRow">Row</label><br>
-                <input type="radio" id="aggregateColumn" name="aggregate" value="Column" checked="true">
-                <label for="aggregateColumn">Column</label><br>
+                <input type="radio" class="form-check-input" id="aggregateRow" name="aggregate" value="Row">
+                <label class="form-check-label for="aggregateRow">Row</label><br>
+                <input type="radio" class="form-check-input" id="aggregateColumn" name="aggregate" value="Column" checked="true">
+                <label class="form-check-label for="aggregateColumn">Column</label><br>
             </fieldset>
 
             <fieldset>
                 <legend> The data has labeled: </legend>
                 <div>
-                    <input type="checkbox" name="dataLabelsRows" id="chkDataLabelRows" />
-                    <label for="dataLabelsRows">Rows</label>
+                    <input class="form-check-input" type="checkbox" name="dataLabelsRows" id="chkDataLabelRows" />
+                    <label class="form-check-label" for="dataLabelsRows">Rows</label>
                 </div>
                 <div>
-                    <input type="checkbox" name="dataLabelsColumns" id="chkDataLabelColumns" checked="true" />
-                    <label for="dataLabelsColumns">Columns</label>
+                    <input type="checkbox" class="form-check-input" name="dataLabelsColumns" id="chkDataLabelColumns" checked="true" />
+                    <label class="form-check-label" for="dataLabelsColumns">Columns</label>
                 </div>
             </fieldset>
 
@@ -104,15 +121,15 @@
         </div>
 
         <div id="inputButtonsRow" class="row justify-content-evenly">
-            <button class="col-3" id="submitFileButton">Submit</button>
-            <button class="col-3" id="clearFileButton">Clear file</button>
+            <button class="btn btn-secondary col-3" id="submitFileButton">Submit</button>
+            <button class="btn btn-secondary col-3" id="clearFileButton">Clear file</button>
         </div>
 
     </div>
 
     <br><br>
     <div id="canvDiv" class="row justify-content-evenly"> <!--Canvas is here-->
-        <canvas id="pieCanvas" width="900" height="800" class="col-9"></canvas>
+        <canvas id="pieCanvas" width="1000" height="800" class="col-9"></canvas>
         <!--TIL: If I don't specify the height and width of the canvas, the drawing will be blurry >:( -->
         <div id="canvasOptions" class="col-3"> <!--Other canvas options go here-->
             <!--for label selection-->
@@ -120,7 +137,8 @@
             <select class="form-select" id="labelSelect">
     
             </select>
-            <p>Select a color you want to change it in:</p>
+            <br>
+            <p>Change the color of the label:</p>
             <select class="form-select" id="colorSelect">
                 <option value="1">white</option>
                 <option value="2">magenta</option>
@@ -132,10 +150,11 @@
                 <option value="8">blue</option>
                 <option value="9">purple</option>
             </select>
+            <br>
             <p>Change its name:</p>
-            <input type="text" id="newLabelInput">
-
-            <button type = "submit" id = "updateBtn">Update</button>
+            <input type="text" class="form-control" id="newLabelInput">
+            <br><br>
+            <button type = "submit" id = "updateBtn" class="btn btn-light col-12">Update</button>
         </div>
     </div>
 

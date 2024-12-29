@@ -11,6 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+    <script src ="./scripts/easter_egg.js"></script>
     <!--end Bootstrap import-->
     <title>About site</title>
 </head>
@@ -18,7 +19,13 @@
 <body style="background-color:blanchedalmond;"> <!--I know it is bad practice :( ~Teea C. -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="./index.html">Pie chart generator</a>
+            <a class="navbar-brand" href="./index.html">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                    class="bi bi-pie-chart-fill" viewBox="0 0 20 20">
+                    <path
+                        d="M15.985 8.5H8.207l-5.5 5.5a8 8 0 0 0 13.277-5.5zM2 13.292A8 8 0 0 1 7.5.015v7.778zM8.5.015V7.5h7.485A8 8 0 0 0 8.5.015" />
+                </svg>
+                Pie chart generator</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -35,7 +42,7 @@
             </div>
         </div>
     </nav>
-    <div id="aboutDiv" class="col-xl-10 col-md-6 col-sm-4">
+    <div id="aboutDiv" class = "container my-5 p-5 text-center bg-body-tertiary rounded-3 border border-secondary">
         <h1>About the site</h1>
         <p>This site is a project for the Multimedia class from our university and it was made by Cranga Ana-Teea and
             Ispas Anisia.</p>
@@ -50,6 +57,10 @@
             <a class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" href="https://github.com/teea-cranga">teea-cranga</a>
             <a class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" href="https://github.com/shad0wYG">shad0w-yg</a>
         </div>
+    </div>
+
+    <div id="easter-egg" class="container my-5 p-5 text-center">
+        <img src="./assets/easter_egg.jpg">
     </div>
 
 </body>

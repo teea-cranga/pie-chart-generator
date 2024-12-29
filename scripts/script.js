@@ -21,6 +21,7 @@ window.onload = function () {
     let height = pieCanvas.height;
     let labelSelect = document.getElementById('labelSelect');
     let colorSelect = document.getElementById('colorSelect');
+    const round10 = (value, exp) => decimalAdjust("round", value, exp); //this rounds the number 
 
     document.getElementById("clearFileButton").addEventListener("click", () => { //clear file button implementation
         fileHandled = undefined;
@@ -34,7 +35,7 @@ window.onload = function () {
         canvDiv.style.visibility = "hidden";
 
         //remove options from the label select
-        for(let i = 0 ; i < labelSelect.length; i++){
+        for (let i = 0; i < labelSelect.length; i++) {
             console.log("I removed option with label: ", labelSelect.options[i].value);
             labelSelect.removeChild(labelSelect.options[i]);
             i--;
@@ -78,9 +79,8 @@ window.onload = function () {
             if (fileHandled) {
 
                 //to avoid some bug that didn't clear the select of labels and just added other labels
-                if(labelSelect.length > 0)
-                {
-                    for(let i = 0 ; i < labelSelect.length; i++){
+                if (labelSelect.length > 0) {
+                    for (let i = 0; i < labelSelect.length; i++) {
                         console.log("I removed option with label: ", labelSelect.options[i].value);
                         labelSelect.removeChild(labelSelect.options[i]);
                         i--;
@@ -102,22 +102,45 @@ window.onload = function () {
                 canvDiv.style.visibility = "visible";    //make the canvas visible
                 document.getElementById('canvasOptions').style.visibility = "visible";
 
-                let angles = drawPie(Arrays.values, Arrays.keys);
+                let [angles, total] = drawPie(Arrays.values, Arrays.keys);
 
-                for(let i = 0; i < Arrays.keys.length; i++){
+                //i know it's not the best approach to this problem but i am desperate ;-;
+                for (let i = 0; i < angles.length; i++) {
+                    if (Number.isNaN(angles[i][0]) || Number.isNaN(angles[i][0])) {
+                        alert('An error occured while trying to create the graph. Clear the file, and try another option.');
+                        canvDiv.style.visibility = "hidden";
+                        document.getElementById('canvasOptions').style.visibility = "hidden";
+                        break;
+                    }
+                }
+
+                for (let i = 0; i < Arrays.keys.length; i++) {
                     let option = document.createElement("option");
-                    option.value = i+1;
+                    option.value = i + 1;
                     option.text = Arrays.keys[i];
                     labelSelect.add(option);
-                }       
-
+                }
 
                 //for updating stuff
-                document.getElementById('updateBtn').addEventListener('click', ()=>{
+                document.getElementById('updateBtn').addEventListener('click', () => {
                     let inputName = document.getElementById('newLabelInput');
-                    console.log(angles[labelSelect.selectedIndex], colorSelect.options[colorSelect.selectedIndex].text, labelSelect.selectedIndex, inputName.value);
-                    //wip
-                    updatePie(Arrays.keys, angles[labelSelect.selectedIndex], colorSelect.options[colorSelect.selectedIndex].text, labelSelect.selectedIndex, inputName.value);
+
+                    //console.log(angles[labelSelect.selectedIndex], colorSelect.options[colorSelect.selectedIndex].text, labelSelect.selectedIndex, inputName.value);
+
+                    if (inputName.value) {
+                        Arrays.keys[labelSelect.selectedIndex] = inputName.value;
+                        labelSelect.options[labelSelect.selectedIndex].text = inputName.value;
+                    }
+
+
+                    //teea disappointing teachers and her partner but somehow still making stuff work, part 329579346034
+                    updatePie(Arrays.keys,
+                        Arrays.values,
+                        total,
+                        angles[labelSelect.selectedIndex],
+                        colorSelect.options[colorSelect.selectedIndex].text,
+                        labelSelect.selectedIndex,
+                        inputName.value);
                 });
 
                 //#endregion
@@ -131,6 +154,8 @@ window.onload = function () {
 
 
     //#region Utils
+
+
     function drawPie(argsArray, labelsArray) {              //input: an array of values
         let total = 0;                                      //used to compute the percentages in pie
         let last = 0;                                       //also for percentage
@@ -164,20 +189,21 @@ window.onload = function () {
             pCtx.save();                                    //to keep the coordinates as they are above
 
             //for labels
+
             pCtx.translate(width / 2 + 150, 30 * (i + 1));  // move the cursor in order for the labels and pie to not overlap
-            console.log('where does it go?', width/2 + 150, 30 * (i+1));
+
             pCtx.fillStyle = "black"; //for text
-            pCtx.font = 22 + "px Arial";
-            pCtx.fillText(labelsArray[i] + ': ' + Math.trunc(argsArray[i] / total * 100) + '%', pCtx.measureText(labelsArray[i]).width / 2, 0);
+            pCtx.font = "24px Arial";
+            pCtx.fillText(labelsArray[i] + ': ' + round10(argsArray[i] / total * 100, -2) + '%', 42, 0);
 
             pCtx.restore(); //idk how and why, but if i delete this, it destroys the pie... this is literally the coconut png situation
         }
 
-        return angles;
+
+        return [angles, total];
     }
 
-    //  WIP !!!!
-    function updatePie(keys, last, newColor, i, newLabel) {
+    function updatePie(keys, values, total, last, newColor, i, label) {
 
         pCtx.beginPath();
         pCtx.fillStyle = newColor;
@@ -188,19 +214,48 @@ window.onload = function () {
         pCtx.rect(width / 2 + 170, 30 * i + 10, 20, 20);
         pCtx.fill();
         pCtx.stroke();
-        pCtx.save();
 
-        pCtx.restore();
+
 
         //#region Dead dove do not eat
-        // pCtx.clearRect(width / 2 + 200, 30 * keys.length, width, height);
-        // for(let i = 0; i < keys.length; i++){
-        //     if(keys[i] === labelSelect.options[i])
-        //         pCtx.fillText(newLabel + ': ' + Math.trunc( 100 / total * 100) + '%', pCtx.measureText(newLabel).width / 2, 0);
+        if (label) {
+            pCtx.clearRect(width / 2 + 191, 1, width, height);
 
-        // }
+            for (let j = 0; j < keys.length; j++) {
+                pCtx.save();
+                pCtx.fillStyle = "black";
+                pCtx.font = "24px Arial";
+                pCtx.translate(width / 2 + 150, 30 * (j + 1));
+                pCtx.fillText(keys[j] + ': ' + round10(values[j] / total * 100, -2) + '%', 42, 0);
+                pCtx.restore();
+            }
+        }
+
         //#endregion
     }
+
+    //source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/floor
+    function decimalAdjust(type, value, exp) {
+        type = String(type);
+        if (!["round", "floor", "ceil"].includes(type)) {
+            throw new TypeError(
+                "The type of decimal adjustment must be one of 'round', 'floor', or 'ceil'.",
+            );
+        }
+        exp = Number(exp);
+        value = Number(value);
+        if (exp % 1 !== 0 || Number.isNaN(value)) {
+            return NaN;
+        } else if (exp === 0) {
+            return Math[type](value);
+        }
+        const [magnitude, exponent = 0] = value.toString().split("e");
+        const adjustedValue = Math[type](`${magnitude}e${exponent - exp}`);
+        // Shift back
+        const [newMagnitude, newExponent = 0] = adjustedValue.toString().split("e");
+        return Number(`${newMagnitude}e${+newExponent + exp}`);
+    }
+
 
     //source https://stackoverflow.com/questions/50528954/give-each-shape-on-html5-canvas-a-random-colour
     function generateRandomColor() {
@@ -254,23 +309,23 @@ window.onload = function () {
 
                     //#region Sums initialization
                     if (aggregateColumn.checked == true) {
-                        if (chkDataLabelRows.checked == true){ //if i want to aggregate by columns and there are labels at the start of every row, i ignore the first column
-                            nrColumns-=1;
+                        if (chkDataLabelRows.checked == true) { //if i want to aggregate by columns and there are labels at the start of every row, i ignore the first column
+                            nrColumns -= 1;
                         }
-                        if (sumDataRows.checked == true){ //if i want to aggregate by columns and the last column is a sum column, i ignore that last column
-                            nrColumns-=1;
-                        } 
-                        sums = new Array(nrColumns).fill(0); 
-                    } 
+                        if (sumDataRows.checked == true) { //if i want to aggregate by columns and the last column is a sum column, i ignore that last column
+                            nrColumns -= 1;
+                        }
+                        sums = new Array(nrColumns).fill(0);
+                    }
 
                     else {
-                        if (chkDataLabelColumns.checked == true){ //if i want to aggregate by rows and there are labels at the start of every column, i ignore the first row
-                            nrRows-=1;
+                        if (chkDataLabelColumns.checked == true) { //if i want to aggregate by rows and there are labels at the start of every column, i ignore the first row
+                            nrRows -= 1;
                         }
-                        if (sumDataColumns.checked == true){ //if i want to aggregate by rows and the last row is a sum row, i ignore that last row
-                            nrRows-=1;
-                        } 
-                        sums = new Array(nrRows).fill(0); 
+                        if (sumDataColumns.checked == true) { //if i want to aggregate by rows and the last row is a sum row, i ignore that last row
+                            nrRows -= 1;
+                        }
+                        sums = new Array(nrRows).fill(0);
                     }
 
                     console.log(`Rows: ${nrRows}, Columns: ${nrColumns}`);
@@ -285,9 +340,9 @@ window.onload = function () {
 
                     console.log(lines)
                     //#endregion
-                    
+
                     //#region Aggregate by rows case
-                    if (aggregateRow.checked == true){
+                    if (aggregateRow.checked == true) {
                         let labelsFlag = Number(chkDataLabelColumns.checked == true); //first row has labels for the columns
                         let sumBadFlag = Number(sumDataColumns.checked == true); //last row is a sum row for the columns
                         let sumGoodFlag = Number(sumDataRows.checked == true); //last column is a sum column for the rows
@@ -295,23 +350,23 @@ window.onload = function () {
                         console.log(`labelsFlag: ${labelsFlag}, sumBadFlag: ${sumBadFlag}, sumGoodFlag: ${sumGoodFlag}`);
                         //console.log(lines[0]);
 
-                        for (let i =0; i< (nrRows + labelsFlag); i++){
+                        for (let i = 0; i < (nrRows + labelsFlag); i++) {
                             Arrays.keys[i] = lines[i][0];
                         }
                         if (labelsFlag) Arrays.keys.shift();
                         // ^ Arrays.keys solved
 
-                        if (sumGoodFlag){
-                            for (let i =0; i< (nrRows+labelsFlag); i++){
-                                Arrays.values[i] = Number(lines[i][nrColumns-1]); //-1 because we start indexes from 0 everywhere
+                        if (sumGoodFlag) {
+                            for (let i = 0; i < (nrRows + labelsFlag); i++) {
+                                Arrays.values[i] = Number(lines[i][nrColumns - 1]); //-1 because we start indexes from 0 everywhere
                             }
                             if (labelsFlag) Arrays.values.shift();
                         }
 
-                        else{
-                            for (let i =0+labelsFlag; i< (nrRows+labelsFlag); i++){
-                                for (let j =1; j< nrColumns; j++){
-                                    sums[i-labelsFlag] += Number(lines[i][j]);
+                        else {
+                            for (let i = 0 + labelsFlag; i < (nrRows + labelsFlag); i++) {
+                                for (let j = 1; j < nrColumns; j++) {
+                                    sums[i - labelsFlag] += Number(lines[i][j]);
                                 }
                             }
                             Arrays.values = sums;
@@ -320,32 +375,32 @@ window.onload = function () {
                     //#endregion
 
                     //#region Aggregate by columns case
-                    else{
+                    else {
                         let labelsFlag = Number(chkDataLabelRows.checked == true); //first column has labels for the rows
                         let sumBadFlag = Number(sumDataRows.checked == true); //last column is a sum column for the rows
                         let sumGoodFlag = Number(sumDataColumns.checked == true); //last row is a sum row for the columns
 
                         console.log(`labelsFlag: ${labelsFlag}, sumBadFlag: ${sumBadFlag}, sumGoodFlag: ${sumGoodFlag}`);
 
-                        for (let i =0; i< (nrColumns + labelsFlag); i++){
+                        for (let i = 0; i < (nrColumns + labelsFlag); i++) {
                             Arrays.keys[i] = lines[0][i];
                         }
                         if (labelsFlag) Arrays.keys.shift();
                         // ^ Arrays.keys solved
 
-                        if (sumGoodFlag){
-                            for (let i =0; i< (nrColumns+labelsFlag); i++){
-                                Arrays.values[i] = Number(lines[nrRows-1][i]); //-1 because we start indexes from 0 everywhere
+                        if (sumGoodFlag) {
+                            for (let i = 0; i < (nrColumns + labelsFlag); i++) {
+                                Arrays.values[i] = Number(lines[nrRows - 1][i]); //-1 because we start indexes from 0 everywhere
                             }
                             if (labelsFlag) Arrays.values.shift();
                         }
 
-                        else{
-                            for (let i =1; i< (nrRows); i++){
-                                    for (let j =0 + labelsFlag; j< (nrColumns+labelsFlag); j++){
-                                        sums[j - labelsFlag] += Number(lines[i][j]);
-                                        //console.log(j, lines[i][j], sums[j]);
-                                    }                                
+                        else {
+                            for (let i = 1; i < (nrRows); i++) {
+                                for (let j = 0 + labelsFlag; j < (nrColumns + labelsFlag); j++) {
+                                    sums[j - labelsFlag] += Number(lines[i][j]);
+                                    //console.log(j, lines[i][j], sums[j]);
+                                }
                             }
                             Arrays.values = sums;
 
@@ -353,7 +408,7 @@ window.onload = function () {
 
                     }
                     //#endregion
-                    
+
                     console.log(Arrays.keys);
                     console.log(Arrays.values);
 
