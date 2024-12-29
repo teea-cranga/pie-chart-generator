@@ -20,10 +20,12 @@
 <body style="background-color: blanchedalmond;">
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            
+
             <a class="navbar-brand" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-pie-chart-fill" viewBox="0 0 20 20">
-                    <path d="M15.985 8.5H8.207l-5.5 5.5a8 8 0 0 0 13.277-5.5zM2 13.292A8 8 0 0 1 7.5.015v7.778zM8.5.015V7.5h7.485A8 8 0 0 0 8.5.015"/>
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                    class="bi bi-pie-chart-fill" viewBox="0 0 20 20">
+                    <path
+                        d="M15.985 8.5H8.207l-5.5 5.5a8 8 0 0 0 13.277-5.5zM2 13.292A8 8 0 0 1 7.5.015v7.778zM8.5.015V7.5h7.485A8 8 0 0 0 8.5.015" />
                 </svg>
                 Pie chart generator
             </a>
@@ -50,18 +52,19 @@
 
         <div id="inputLabelRow" class="row justify-content-evenly">
             <label class="col-3" for="selectFileInput">Select a local csv file</label>
-            <div class = "col-1"></div>
+            <div class="col-1"></div>
             <label class="col-3" for="dragDropFileInput">Drag and drop a file here</label>
         </div>
 
         <div id="inputInputsRow" class="row justify-content-evenly">
-            <input class="col-3" type="file" id="selectFileInput" accept=".csv"> <!--https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file might be helpful later-->
+            <input class="col-3" type="file" id="selectFileInput" accept=".csv">
+            <!--https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file might be helpful later-->
 
-            <label class = "col-1">OR</label>
+            <label class="col-1">OR</label>
 
             <div class="col-3" id="drop-target" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
-                <div id = dropFeedback>File Received</div> 
-            </div> 
+                <div id=dropFeedback>File Received</div>
+            </div>
         </div>
         <br><br>
 
@@ -70,10 +73,10 @@
                 <legend> We should aggregate by: </legend>
                 <input type="radio" id="aggregateRow" name="aggregate" value="Row">
                 <label for="aggregateRow">Row</label><br>
-                <input type="radio" id="aggregateColumn" name="aggregate" value="Column" checked="true" >
+                <input type="radio" id="aggregateColumn" name="aggregate" value="Column" checked="true">
                 <label for="aggregateColumn">Column</label><br>
             </fieldset>
-    
+
             <fieldset>
                 <legend> The data has labeled: </legend>
                 <div>
@@ -81,11 +84,11 @@
                     <label for="dataLabelsRows">Rows</label>
                 </div>
                 <div>
-                    <input type="checkbox" name="dataLabelsColumns" id="chkDataLabelColumns" checked="true"/>
+                    <input type="checkbox" name="dataLabelsColumns" id="chkDataLabelColumns" checked="true" />
                     <label for="dataLabelsColumns">Columns</label>
                 </div>
             </fieldset>
-    
+
             <fieldset>
                 <legend> There is a sum for ___ of the data. </legend>
                 <div>
@@ -97,7 +100,7 @@
                     <label for="sumDataColumns" title="the last row is a sum row">every column</label>
                 </div>
             </fieldset>
-        </form>        
+            </form>
         </div>
 
         <div id="inputButtonsRow" class="row justify-content-evenly">
@@ -107,12 +110,34 @@
 
     </div>
 
-    <div id="canvDiv"> <!--Canvas is here-->
-        <canvas id="pieCanvas" width = "900" height = "800" ></canvas>  <!--TIL: If I don't specify the height and width of the canvas, the drawing will be blurry >:( -->
-    </div>
+    <br><br>
+    <div id="canvDiv" class="row justify-content-evenly"> <!--Canvas is here-->
+        <canvas id="pieCanvas" width="900" height="800" class="col-9"></canvas>
+        <!--TIL: If I don't specify the height and width of the canvas, the drawing will be blurry >:( -->
+        <div id="canvasOptions" class="col-3"> <!--Other canvas options go here-->
+            <!--for label selection-->
+            <p>Select the label you want to update:</p>
+            <select class="form-select" id="labelSelect">
     
-    <div id="canvasOptions"> <!--Other canvas options go here-->
-    </div>  
+            </select>
+            <p>Select a color you want to change it in:</p>
+            <select class="form-select" id="colorSelect">
+                <option value="1">white</option>
+                <option value="2">magenta</option>
+                <option value="3">red</option>
+                <option value="4">orange</option>
+                <option value="5">yellow</option>
+                <option value="6">green</option>
+                <option value="7">cyan</option>
+                <option value="8">blue</option>
+                <option value="9">purple</option>
+            </select>
+            <p>Change its name:</p>
+            <input type="text" id="newLabelInput">
+
+            <button type = "submit" id = "updateBtn">Update</button>
+        </div>
+    </div>
 
 
 </body>

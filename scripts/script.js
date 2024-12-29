@@ -13,20 +13,32 @@ window.onload = function () {
     let pieCanvas = document.getElementById('pieCanvas');
     let pCtx = pieCanvas.getContext("2d");
     let canvDiv = document.getElementById('canvDiv');
-    let canvasOptions = document.getElementById('canvasOptions');
+
     let submitBtn = document.getElementById("submitFileButton");
     let fileInput = document.getElementById("selectFileInput")
 
     let width = pieCanvas.width;
     let height = pieCanvas.height;
-    let defaultColors = ["red", "orange", "green", "yellow", "blue", "white", "purple", "cyan", "magenta"];
+    let labelSelect = document.getElementById('labelSelect');
+    let colorSelect = document.getElementById('colorSelect');
 
     document.getElementById("clearFileButton").addEventListener("click", () => { //clear file button implementation
         fileHandled = undefined;
         document.getElementById("dropFeedback").style.visibility = 'hidden';
         document.getElementById("inputCustomizables").style.display = "none";
+        document.getElementById('canvasOptions').style.visibility = "hidden";
         fileInput.value = '';
 
+        //reset canvas
+        pCtx.clearRect(0, 0, width, height);
+        canvDiv.style.visibility = "hidden";
+
+        //remove options from the label select
+        for(let i = 0 ; i < labelSelect.length; i++){
+            console.log("I removed option with label: ", labelSelect.options[i].value);
+            labelSelect.removeChild(labelSelect.options[i]);
+            i--;
+        }
     })
 
     //#region  Flag validation
@@ -65,7 +77,15 @@ window.onload = function () {
         else {
             if (fileHandled) {
 
-
+                //to avoid some bug that didn't clear the select of labels and just added other labels
+                if(labelSelect.length > 0)
+                {
+                    for(let i = 0 ; i < labelSelect.length; i++){
+                        console.log("I removed option with label: ", labelSelect.options[i].value);
+                        labelSelect.removeChild(labelSelect.options[i]);
+                        i--;
+                    }
+                }
 
                 let Arrays = {
                     keys: [],
@@ -80,42 +100,25 @@ window.onload = function () {
 
                 //#region Canvas stuff
                 canvDiv.style.visibility = "visible";    //make the canvas visible
-                canvasOptions.style.visibility = "visible";
-                submitBtn.disabled = true;
+                document.getElementById('canvasOptions').style.visibility = "visible";
 
                 let angles = drawPie(Arrays.values, Arrays.keys);
 
-                for (i = 0; i < Arrays.values.length; i++) {
-                    let div = document.createElement("div");
-                    div.classList = 'container text-center';
+                for(let i = 0; i < Arrays.keys.length; i++){
+                    let option = document.createElement("option");
+                    option.value = i+1;
+                    option.text = Arrays.keys[i];
+                    labelSelect.add(option);
+                }       
 
-                    let text = document.createTextNode("Label: " + Arrays.keys[i]);
-                    text.classList = 'text';
 
-                    let textInput1 = document.createElement('p');
-                    textInput1.innerHTML = "Enter new name: "
-                    let inputLabel = document.createElement("input");
-
-                    let textInput2 = document.createElement('p');
-                    textInput2.innerHTML = "Enter color: "
-                    let inputColor = document.createElement("input");
-                    inputColor.style.margin = "3px";
-
-                    let divButt = document.createElement('div');
-                    divButt.classList = 'row justify-content';
-                    let subButton = document.createElement('button');
-                    subButton.classList = "col-2 offset-5";
-                    subButton.innerHTML = "Update";
-                    divButt.appendChild(subButton);
-
-                    div.appendChild(text);
-                    div.appendChild(textInput1);
-                    div.appendChild(inputLabel);
-                    div.appendChild(textInput2);
-                    div.appendChild(inputColor);
-                    div.appendChild(divButt);
-                    canvasOptions.appendChild(div);
-                }
+                //for updating stuff
+                document.getElementById('updateBtn').addEventListener('click', ()=>{
+                    let inputName = document.getElementById('newLabelInput');
+                    console.log(angles[labelSelect.selectedIndex], colorSelect.options[colorSelect.selectedIndex].text, labelSelect.selectedIndex, inputName.value);
+                    //wip
+                    updatePie(Arrays.keys, angles[labelSelect.selectedIndex], colorSelect.options[colorSelect.selectedIndex].text, labelSelect.selectedIndex, inputName.value);
+                });
 
                 //#endregion
             }
@@ -162,8 +165,9 @@ window.onload = function () {
 
             //for labels
             pCtx.translate(width / 2 + 150, 30 * (i + 1));  // move the cursor in order for the labels and pie to not overlap
+            console.log('where does it go?', width/2 + 150, 30 * (i+1));
             pCtx.fillStyle = "black"; //for text
-            pCtx.font = height / 3 / 10 + "px Arial";
+            pCtx.font = 22 + "px Arial";
             pCtx.fillText(labelsArray[i] + ': ' + Math.trunc(argsArray[i] / total * 100) + '%', pCtx.measureText(labelsArray[i]).width / 2, 0);
 
             pCtx.restore(); //idk how and why, but if i delete this, it destroys the pie... this is literally the coconut png situation
@@ -173,11 +177,7 @@ window.onload = function () {
     }
 
     //  WIP !!!!
-    function updatePieColor(last, newColor, i) {
-
-        if (last.length < i) {
-            alert("error");
-        }
+    function updatePie(keys, last, newColor, i, newLabel) {
 
         pCtx.beginPath();
         pCtx.fillStyle = newColor;
@@ -191,6 +191,15 @@ window.onload = function () {
         pCtx.save();
 
         pCtx.restore();
+
+        //#region Dead dove do not eat
+        // pCtx.clearRect(width / 2 + 200, 30 * keys.length, width, height);
+        // for(let i = 0; i < keys.length; i++){
+        //     if(keys[i] === labelSelect.options[i])
+        //         pCtx.fillText(newLabel + ': ' + Math.trunc( 100 / total * 100) + '%', pCtx.measureText(newLabel).width / 2, 0);
+
+        // }
+        //#endregion
     }
 
     //source https://stackoverflow.com/questions/50528954/give-each-shape-on-html5-canvas-a-random-colour
@@ -383,7 +392,7 @@ window.onload = function () {
 
 }
 
-
+//#region Drag and Drop
 function dragOverHandler(ev) {
     console.log('File(s) in drop zone');
     ev.preventDefault();
@@ -412,3 +421,4 @@ function removeDragData(ev) {
         ev.dataTransfer.items.clear();
     }
 }
+//#endregion
